@@ -29,6 +29,7 @@ var cut_sound;
 var sad_sound;
 var eating_sound;
 var air;
+
 function preload()
 {
   bg_img = loadImage('background.png');
@@ -54,7 +55,7 @@ function preload()
 
 function setup() {
   createCanvas(500,700);
-
+ 
   frameRate(80);
 
   bk_song.play();
@@ -68,6 +69,15 @@ function setup() {
   button.size(50,50);
   button.mouseClicked(drop);
 
+  blower = createImg('balloon.png');
+  blower.position(10,250);
+  blower.size(150,100);
+  blower.mouseClicked(airblow);
+
+  mute_btn = createImg('mute.png');
+  mute_btn.position(450,20);
+  mute_btn.size(50,50);
+  mute_btn.mouseClicked(mute);
   
   rope = new Rope(7,{x:245,y:30});
   ground = new Ground(200,690,600,20);
@@ -75,7 +85,7 @@ function setup() {
   blink.frameDelay = 20;
   eat.frameDelay = 20;
 
-  bunny = createSprite(230,620,100,100);
+  bunny = createSprite(420,620,100,100);
   bunny.scale = 0.2;
 
   bunny.addAnimation('blinking',blink);
@@ -115,12 +125,15 @@ function draw()
   if(collide(fruit,bunny)==true)
   {
     bunny.changeAnimation('eating');
+    eating_sound.play();
   }
 
 
   if(fruit!=null && fruit.position.y>=650)
   {
     bunny.changeAnimation('crying');
+    bk_song.stop();
+    sad_sound.play();
     fruit=null;
      
    }
@@ -129,11 +142,19 @@ function draw()
 
 function drop()
 {
+  cut_sound.play();
   rope.break();
   fruit_con.detach();
   fruit_con = null; 
 }
 
+function keyPressed()
+{
+  if(keyCode==LEFT_ARROW)
+  {
+    airblow();
+  }
+}
 
 function collide(body,sprite)
 {
@@ -152,4 +173,20 @@ function collide(body,sprite)
          }
 }
 
+function airblow()
+{
+  Matter.Body.applyForce(fruit,{x:0,y:0},{x:0.01,y:0});
+  air.play();
+}
 
+
+function mute()
+{
+  if(bk_song.isPlaying())
+     {
+      bk_song.stop();
+     }
+     else{
+      bk_song.play();
+     }
+}
